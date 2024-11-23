@@ -2,22 +2,20 @@
 <head>
     <meta charset="UTF-8">
     <title>Bezier convolution drawer</title>
-    <style>
-        canvas {
-            border: 1px solid black;
-            cursor: crosshair;
-        }
-    </style>
+    <link rel="stylesheet" href="stylesheet.css">
 </head>
 <body>
-    <button id="drawingMode">Drawing Mode</button>
-    <button id="addConvolution">Add Convolution</button>
-    <button id="deleteConvolution">Delete Convolution</button>
-    <button id="ensureContinuity">Ensure Continuity</button>
-    <button id="ensureSmoothness">Ensure Smoothness</button>
-    <button id="clear">Clear</button>
-    
-    <canvas id="bezierCanvas" width="800" height="600"></canvas>
+    <div class="container">
+        <div class="controls">
+            <button id="drawingMode">Drawing Mode</button>
+            <button id="addConvolution">Add Convolution</button>
+            <button id="deleteConvolution">Delete Convolution</button>
+            <button id="ensureContinuity">Ensure Continuity</button>
+            <button id="ensureSmoothness">Ensure Smoothness</button>
+            <button id="clear">Clear</button>
+        </div>
+        <canvas id="bezierCanvas" width="850" height="650"></canvas>
+    </div>
     <script src="main.js"></script>
 </body>
 </html>

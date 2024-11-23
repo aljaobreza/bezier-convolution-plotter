@@ -25,7 +25,10 @@ toggleDrawing.addEventListener("click", () => {
     }
 
     drawingEnabled = !drawingEnabled;   
-    toggleDrawing.style.backgroundColor = drawingEnabled ? "#a0f587" : "";
+    toggleDrawing.style.backgroundColor = drawingEnabled ? "#db90de" : "";
+
+    // changing cursor
+    canvas.style.cursor = drawingEnabled ? "crosshair" : "default";
 
     drawCanvas();
 });
@@ -167,7 +170,7 @@ function drawCanvas(){
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     convolutions.forEach((convolution, index) => {
-        const color = index == selectedConvolution ? "#9433de" : "#2056e8";
+        const color = index == selectedConvolution ? "#db90de" : "#2056e8";
         drawConvolution(convolution, color);
     });
 
