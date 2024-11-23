@@ -1,62 +1,107 @@
 const canvas = document.getElementById("bezierCanvas");
 const ctx = canvas.getContext("2d");
 
+// buttons
 const toggleDrawing = document.getElementById("drawingMode");
+const addConvolution = document.getElementById("addConvolution");
 
-let controlPoints = [];
+let convolutions = [];
+let selectedConvolution = null;
+let controlPoints = []; // points for the currently active convolution
 
 let drawingEnabled = false;
 
-toggleDrawing.addEventListener("click", (event) => {
-    drawingEnabled = !drawingEnabled;
+// toggle drawing mode
+toggleDrawing.addEventListener("click", () => {
+    if(drawingEnabled && controlPoints.length > 0){
+        saveCurrentConvolution();
+    }
+
+    drawingEnabled = !drawingEnabled;   
     toggleDrawing.style.backgroundColor = drawingEnabled ? "#a0f587" : "";
+
+    drawCanvas();
+});
+
+// start a new convolution
+addConvolution.addEventListener("click", () => {
+    if(controlPoints.length > 0){
+        saveCurrentConvolution();
+        drawCanvas();
+    }
 });
 
 // add a new control point on mouse click
 canvas.addEventListener("click", (event) => {
-    if(!drawingEnabled) return;
-
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
+
+    if(!drawingEnabled){
+        selectClosestConvolution({x, y});
+        return;
+    }
 
     controlPoints.push({x, y});
 
     drawCanvas();
 });
 
+// save the convolution
+function saveCurrentConvolution(){
+    convolutions.push([...controlPoints]);
+    controlPoints = [];
+}
+
 function drawCanvas(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    convolutions.forEach((convolution, index) => {
+        const color = index == selectedConvolution ? "#9433de" : "#2056e8";
+        drawConvolution(convolution, color);
+    });
+
+    if(controlPoints.length > 0){
+        drawConvolution(controlPoints, "#2056e8");
+    }
+    
+}
+
+function drawConvolution(points, color){
     // draw points
-    ctx.fillStyle = "red";
-    controlPoints.forEach(point => {
+    ctx.fillStyle = "#d61818";
+    points.forEach((point) => {
         ctx.beginPath();
-        ctx.arc(point.x, point.y, 5, 0, Math.PI * 2);
+        ctx.arc(point.x, point.y, 4, 0, Math.PI * 2);
         ctx.fill();
     });
 
     // draw connecting lines between points
-    if(controlPoints.length > 1 && controlPoints.length % 4 != 1){
-        let lastPoint = controlPoints.length - 1;
-
-        ctx.strokeStyle = "#bac2cf";
+    if(points.length > 1){
+        ctx.strokeStyle = "#aeb5bf";
         ctx.beginPath();
-        ctx.moveTo(controlPoints[lastPoint - 1].x, controlPoints[lastPoint - 1].y);
+        ctx.moveTo(points[0].x, points[0].y);
 
-        ctx.lineTo(controlPoints[lastPoint].x, controlPoints[lastPoint].y);
-
+        for(let i = 1; i < points.length; i++){
+            if(i % 4 == 0){
+                ctx.moveTo(points[i].x, points[i].y);
+                continue;
+            }
+            ctx.lineTo(points[i].x, points[i].y);
+        }
         ctx.stroke();
     }
 
     // draw curves
-    if(controlPoints.length >= 4 && controlPoints.length % 4 == 0){
-        drawBezier(controlPoints.slice(-4));
+    for(let i = 0; i <= points.length - 4; i += 4){
+        drawBezier(points.slice(i, i + 4), color);
     }
 }
 
-function drawBezier(points){
+function drawBezier(points, color){
     const[p0, p1, p2, p3] = points;
 
-    ctx.strokeStyle = "blue";
+    ctx.strokeStyle = color;
     ctx.beginPath();
 
     const accuracy = Math.ceil(
@@ -89,3 +134,25 @@ function calculateBezier(t, p0, p1, p2, p3){
 
     return lerp(p012, p123, t);
 }
+
+// select the closest convolution
+function selectClosestConvolution(clickPoint){
+    let closestIndex = null;
+    let minDistance = Infinity;
+
+    convolutions.forEach((convolution, index) => {
+        convolution.forEach((point) => {
+            const distance = Math.hypot(clickPoint.x - point.x, clickPoint.y - point.y);
+            if(distance < minDistance){
+                minDistance = distance;
+                closestIndex = index;
+            }
+        });
+    });
+
+    if(closestIndex != selectedConvolution){
+        selectedConvolution = closestIndex;
+        drawCanvas();
+    }
+}
+
