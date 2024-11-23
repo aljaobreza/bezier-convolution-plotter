@@ -4,12 +4,19 @@ const ctx = canvas.getContext("2d");
 // buttons
 const toggleDrawing = document.getElementById("drawingMode");
 const addConvolution = document.getElementById("addConvolution");
+const deleteConvolution = document.getElementById("deleteConvolution");
+const ensureContinuity = document.getElementById("ensureContinuity");
+const ensureSmoothness = document.getElementById("ensureSmoothness");
+const clearCanvas = document.getElementById("clear");
 
 let convolutions = [];
 let selectedConvolution = null;
 let controlPoints = []; // points for the currently active convolution
 
 let drawingEnabled = false;
+
+let draggingPoint = null; // the control point being dragged
+let draggingPointIndex = null; // index of the dragged point in the selected convolution
 
 // toggle drawing mode
 toggleDrawing.addEventListener("click", () => {
@@ -31,6 +38,72 @@ addConvolution.addEventListener("click", () => {
     }
 });
 
+// delete convolution
+deleteConvolution.addEventListener("click", () => {
+    if(selectedConvolution == null) return;
+
+    convolutions.splice(selectedConvolution, 1);
+    selectedConvolution = null;
+
+    drawCanvas();
+});
+
+// ensuring continuity C**0
+ensureContinuity.addEventListener("click", () => {
+    if(selectedConvolution == null) return;
+
+    const points = convolutions[selectedConvolution];
+
+    if(points.length < 8) return;
+
+    for(let i = 4; i < points.length; i += 4){
+        const endOfPrev = points[i - 1];
+        const startOfNext = points[i];
+
+        startOfNext.x = endOfPrev.x;
+        startOfNext.y = endOfPrev.y;
+    }
+
+    drawCanvas();
+});
+
+// ensuring continuity C**1
+ensureSmoothness.addEventListener("click", () => {
+    if(selectedConvolution == null) return;
+
+    const points = convolutions[selectedConvolution];
+
+    if(points.length < 8) return;
+
+    for(let i = 4; i < points.length; i += 4){
+        const p3prev = points[i - 1];
+        const p2prev = points[i - 2];
+        const p0next = points[i];
+        const p1next = points[i + 1];
+
+        // C**0 continuity
+        p0next.x = p3prev.x;
+        p0next.y = p3prev.y;
+
+        // C**1 continuity
+        const dx = p3prev.x - p2prev.x;
+        const dy = p3prev.y - p2prev.y;
+
+        // mantaining tangent alignment
+        p1next.x = p0next.x + dx;
+        p1next.y = p0next.y + dy;
+    }
+
+    drawCanvas();
+});
+
+// clear canvas
+clearCanvas.addEventListener("click", () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    convolutions = [];
+});
+
+
 // add a new control point on mouse click
 canvas.addEventListener("click", (event) => {
     const rect = canvas.getBoundingClientRect();
@@ -45,6 +118,43 @@ canvas.addEventListener("click", (event) => {
     controlPoints.push({x, y});
 
     drawCanvas();
+});
+
+canvas.addEventListener("mousedown", (event) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    if(selectedConvolution == null) return;
+
+    // check if a point in the selected convolution is clicked
+    const points = convolutions[selectedConvolution];
+    points.forEach((point, index) => {
+        const distance = Math.hypot(point.x - x, point.y - y);
+        if(distance < 10){
+            draggingPoint = point;
+            draggingPointIndex = index;
+        }
+    });
+});
+
+canvas.addEventListener("mousemove", (event) => {
+    if(!draggingPoint) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    // update the position of the dragged point
+    draggingPoint.x = x;
+    draggingPoint.y = y;
+
+    drawCanvas();
+});
+
+canvas.addEventListener("mouseup", () => {
+    draggingPoint = null;
+    draggingPointIndex = null;
 });
 
 // save the convolution
