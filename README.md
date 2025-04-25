@@ -1,6 +1,8 @@
 # Bezier convolution drawer
 
-Cubic Bezier curve convolution drawer and editor, made for a school project.
+Cubic Bezier curve convolution drawer and editor, made for a school assignment.
+
+Link: https://aljaobreza.github.io/bezierConvolutionDrawer/
 
 Functionalities:
 -
