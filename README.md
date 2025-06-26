@@ -1,8 +1,8 @@
-# Bezier convolution drawer
+# Bezier convolution plotter
 
-Cubic Bezier curve convolution drawer and editor, made for a school assignment.
+Cubic Bezier curve convolution plotter and editor, made for a school assignment.
 
-Link: https://aljaobreza.github.io/bezierConvolutionDrawer/
+Link: https://aljaobreza.github.io/bezier-convolution-plotter/
 
 Functionalities:
 -
@@ -12,4 +12,4 @@ Functionalities:
  - Ensure Continuity: ensures continuity C⁰ of the selected convolution,
  - Ensure Smoothness: ensures continuity C¹ of the selected convolution.
 
-When drawing mode isn't enabled, convolutions can be selected by clicking near them. Curves of the selected convolution can be edited by clicking and dragging the control points.
+When drawing mode isn't enabled, convolutions can be selected by clicking on or near them. Curves of the selected convolution can be edited by clicking and dragging the control points.
