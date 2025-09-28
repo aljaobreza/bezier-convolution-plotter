@@ -1,6 +1,6 @@
 # Bezier convolution plotter
 
-Cubic Bezier curve convolution plotter and editor, made for a school assignment.
+Cubic Bezier curve convolution plotter and editor, made for a college class assignment.
 
 Link: https://aljaobreza.github.io/bezier-convolution-plotter/
 
